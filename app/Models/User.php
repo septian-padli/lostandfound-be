@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\City;
+use App\Models\Item;
+use App\Models\Comment;
+use App\Models\Province;
+use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasUlids;
+    use HasFactory, Notifiable, HasUlids, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.

@@ -1,2032 +1,2208 @@
 {
-	"openapi": "3.0.3",
-	"info": {
-		"title": "API Lost&Found",
-		"description": "API for the Lost&Found application, provide management of user, authentication, item, and comments.",
-		"version": "1.0"
-	},
-	"servers": [{ "url": "http://localhost:8889" }],
-	"tags": [
-		{
-			"name": "User",
-			"description": "Operations related to user management and authentication"
-		},
-		{
-			"name": "Category",
-			"description": "Operations related to item categories"
-		},
-		{
-			"name": "Province",
-			"description": "Operations related to provinces"
-		},
-		{
-			"name": "City",
-			"description": "Operations related to cities"
-		},
-		{
-			"name": "Item",
-			"description": "Operations related to item management"
-		},
-		{
-			"name": "Comment",
-			"description": "Operations related to comments on items"
-		}
-	],
-	"paths": {
-		"/api/login": {
-			"post": {
-				"tags": ["User"],
-				"summary": "Login or Sign Up with Google",
-				"description": "Authenticate a user using Google OAuth. If the user does not exist, create a new user and return a JWT token.",
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"id_token": {
-										"type": "string",
-										"description": "Google ID token"
-									}
-								},
-								"required": ["id_token"]
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Successful login or sign up",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"email": { "type": "string" },
-												"name": { "type": "string", "nullable": true },
-												"token": { "type": "string" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/user/{idOrEmail}": {
-			"get": {
-				"tags": ["User"],
-				"summary": "Get User by ID or Email",
-				"description": "Retrieve user information by user ID or email address.",
-				"parameters": [
-					{
-						"name": "idOrEmail",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "User ID or email address"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of user information",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"email": { "type": "string" },
-												"name": { "type": "string", "nullable": true },
-												"username": { "type": "string", "nullable": true },
-												"photoprofile": { "type": "string", "nullable": true },
-												"isAdmin": { "type": "boolean" },
-												"city": { "type": "string", "nullable": true },
-												"province": { "type": "string", "nullable": true }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "User not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"patch": {
-				"tags": ["User"],
-				"summary": "Update User Information",
-				"description": "Update user information such as username, photoprofile, city, and province.",
-				"parameters": [
-					{
-						"name": "idOrEmail",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "User ID or email address"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"username": { "type": "string", "nullable": true },
-									"name": { "type": "string", "nullable": true },
-									"photoprofile": { "type": "string", "nullable": true },
-									"city": { "type": "string", "nullable": true },
-									"province": { "type": "string", "nullable": true }
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Successful update of user information",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"email": { "type": "string" },
-												"name": { "type": "string", "nullable": true },
-												"username": { "type": "string", "nullable": true },
-												"photoprofile": { "type": "string", "nullable": true },
-												"isAdmin": { "type": "boolean" },
-												"city": { "type": "string", "nullable": true },
-												"province": { "type": "string", "nullable": true }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "User not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/category": {
-			"get": {
-				"tags": ["Category"],
-				"summary": "Get All Categories",
-				"description": "Retrieve a list of all item categories.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of categories",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"properties": {
-													"id": { "type": "string" },
-													"name": { "type": "string" },
-													"slug": { "type": "string" },
-													"itemCount": { "type": "number" }
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Categories not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"post": {
-				"tags": ["Category"],
-				"summary": "Create a New Category",
-				"description": "Create a new item category with a name and slug.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"name": {
-										"type": "string",
-										"description": "Name of the category"
-									},
-									"slug": {
-										"type": "string",
-										"description": "Slug for the category",
-										"uniqueItems": true
-									}
-								},
-								"required": ["name", "slug"]
-							}
-						}
-					}
-				},
-				"responses": {
-					"201": {
-						"description": "Category created successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"slug": { "type": "string" },
-												"itemCount": { "type": "number" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/category/{idCategoryOrSlug}": {
-			"get": {
-				"tags": ["Category"],
-				"summary": "Get Category by ID or Slug",
-				"description": "Retrieve a category by its ID or slug.",
-				"parameters": [
-					{
-						"name": "idCategoryOrSlug",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID or slug of the category"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of category",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"slug": { "type": "string" },
-												"itemCount": { "type": "number" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Category not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/province": {
-			"get": {
-				"tags": ["Province"],
-				"summary": "Get All Provinces",
-				"description": "Retrieve a list of all provinces.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of provinces",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"properties": {
-													"id": { "type": "string" },
-													"name": { "type": "string" }
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Provinces not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/province/{idProvinceOrSlug}": {
-			"get": {
-				"tags": ["Province"],
-				"summary": "Get Province by ID or Slug",
-				"description": "Retrieve a province by its ID or slug.",
-				"parameters": [
-					{
-						"name": "idProvinceOrSlug",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID or slug of the province"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of province",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"cities": {
-													"type": "array",
-													"items": {
-														"type": "object",
-														"properties": {
-															"id": { "type": "string" },
-															"name": { "type": "string" }
-														}
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Province not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/city": {
-			"get": {
-				"tags": ["City"],
-				"summary": "Get All Cities",
-				"description": "Retrieve a list of all cities.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of cities",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"properties": {
-													"id": { "type": "string" },
-													"name": { "type": "string" },
-													"provinceId": { "type": "string" }
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Cities not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/city/{idCityOrSlug}": {
-			"get": {
-				"tags": ["City"],
-				"summary": "Get City by ID or Slug",
-				"description": "Retrieve a city by its ID or slug.",
-				"parameters": [
-					{
-						"name": "idCityOrSlug",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID or slug of the city"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of city",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"provinceId": { "type": "string" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "City not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": {
-											"type": "object"
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/item": {
-			"get": {
-				"tags": ["Item"],
-				"summary": "Get All Items (Infinite Scroll)",
-				"description": "Retrieve a paginated list of items for infinite scroll. Requires authentication.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					},
-					{
-						"name": "limit",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "integer",
-							"default": 20,
-							"minimum": 1,
-							"maximum": 100
-						},
-						"description": "Number of items to return"
-					},
-					{
-						"name": "cursor",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "string"
-						},
-						"description": "Cursor for pagination (e.g., last item ID or timestamp)"
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of items",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"properties": {
-													"id": { "type": "string" },
-													"name": { "type": "string" },
-													"description": { "type": "string" },
-													"category": {
-														"type": "object",
-														"properties": {
-															"slug": { "type": "string" },
-															"name": { "type": "string" }
-														}
-													},
-													"address": { "type": "string" },
-													"city": {
-														"type": "object",
-														"properties": {
-															"slug": { "type": "string" },
-															"name": { "type": "string" }
-														}
-													},
-													"province": {
-														"type": "object",
-														"properties": {
-															"slug": { "type": "string" },
-															"name": { "type": "string" }
-														}
-													},
-													"images": {
-														"type": "array",
-														"items": {
-															"type": "object",
-															"properties": {
-																"id": { "type": "string" },
-																"url": { "type": "string" }
-															}
-														}
-													},
-													"user": {
-														"type": "object",
-														"properties": {
-															"name": { "type": "string" },
-															"username": { "type": "string" },
-															"photoprofile": {
-																"type": "string",
-																"nullable": true
-															}
-														}
-													},
-													"isFound": {
-														"type": "boolean"
-													},
-													"foundAt": {
-														"type": "string",
-														"format": "date-time",
-														"nullable": true
-													},
-													"isActive": {
-														"type": "boolean"
-													},
-													"createdAt": {
-														"type": "string",
-														"format": "date-time"
-													},
-													"countComment": { "type": "number" }
-												}
-											}
-										},
-										"nextCursor": {
-											"type": "string",
-											"nullable": true,
-											"description": "Cursor for the next page, or null if no more data"
-										}
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"post": {
-				"tags": ["Item"],
-				"summary": "Create a New Item",
-				"description": "Create a new item. Requires authentication.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"userId": { "type": "string" },
-									"name": { "type": "string" },
-									"description": { "type": "string" },
-									"address": { "type": "string" },
-									"categoryId": { "type": "string" },
-									"cityId": { "type": "string" },
-									"provinceId": { "type": "string" },
-									"images": {
-										"type": "array",
-										"items": {
-											"type": "string",
-											"format": "binary",
-											"description": "Image file"
-										}
-									}
-								},
-								"required": [
-									"userId",
-									"name",
-									"description",
-									"address",
-									"categoryId",
-									"cityId",
-									"provinceId",
-									"images"
-								]
-							}
-						}
-					}
-				},
-				"responses": {
-					"201": {
-						"description": "Item created successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"description": { "type": "string" },
-												"category": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"address": { "type": "string" },
-												"city": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"province": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"images": {
-													"type": "array",
-													"items": {
-														"type": "object",
-														"properties": {
-															"id": { "type": "string" },
-															"url": { "type": "string" }
-														}
-													}
-												},
-												"user": {
-													"type": "object",
-													"properties": {
-														"name": { "type": "string" },
-														"username": { "type": "string" },
-														"photoprofile": {
-															"type": "string",
-															"nullable": true
-														}
-													}
-												},
-												"createdAt": {
-													"type": "string",
-													"format": "date-time"
-												},
-												"countComment": { "type": "number" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/item/{idItem}": {
-			"get": {
-				"tags": ["Item"],
-				"summary": "Get Item by ID",
-				"description": "Retrieve a single item by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of item",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string" },
-												"description": { "type": "string" },
-												"category": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"address": { "type": "string" },
-												"city": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"province": {
-													"type": "object",
-													"properties": {
-														"slug": { "type": "string" },
-														"name": { "type": "string" }
-													}
-												},
-												"images": {
-													"type": "array",
-													"items": {
-														"type": "object",
-														"properties": {
-															"id": { "type": "string" },
-															"url": { "type": "string" }
-														}
-													}
-												},
-												"user": {
-													"type": "object",
-													"properties": {
-														"name": { "type": "string" },
-														"username": { "type": "string" },
-														"photoprofile": {
-															"type": "string",
-															"nullable": true
-														}
-													}
-												},
-												"isFound": {
-													"type": "boolean"
-												},
-												"foundAt": {
-													"type": "string",
-													"format": "date-time",
-													"nullable": true
-												},
-												"isActive": {
-													"type": "boolean"
-												},
-												"createdAt": {
-													"type": "string",
-													"format": "date-time"
-												},
-												"editedAt": {
-													"type": "string",
-													"format": "date-time",
-													"nullable": true
-												},
-												"countComment": { "type": "number" }
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Item not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"patch": {
-				"tags": ["Item"],
-				"summary": "Update Item by ID",
-				"description": "Update an existing item by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"description": { "type": "string", "nullable": true },
-									"address": { "type": "string", "nullable": true }
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Item updated successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "object",
-											"properties": {
-												"id": { "type": "string" },
-												"name": { "type": "string", "nullable": true },
-												"description": { "type": "string", "nullable": true }
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/item/{idItem}/images": {
-			"post": {
-				"tags": ["Item"],
-				"summary": "Upload some Images for Item",
-				"description": "Upload images for an item by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"multipart/form-data": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"images": {
-										"type": "array",
-										"items": {
-											"type": "string",
-											"format": "binary",
-											"description": "Image file"
-										}
-									}
-								},
-								"required": ["images"]
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Images uploaded successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"type": "object",
-												"properties": {
-													"id": { "type": "string" },
-													"url": { "type": "string" }
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"tags": ["Item"],
-				"summary": "Delete Images from Item",
-				"description": "Delete one or more images from an item by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"imageIds": {
-										"type": "array",
-										"items": {
-											"type": "string"
-										},
-										"description": "Array of image IDs to delete"
-									}
-								},
-								"required": ["imageIds"]
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Images deleted successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "boolean"
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/item/{idItem}/found": {
-			"patch": {
-				"tags": ["Item"],
-				"summary": "Mark Item as Found",
-				"description": "Mark an item as found by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Item marked as found successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": { "type": "boolean" }
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Item not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/item/{idItem}/nonactive": {
-			"patch": {
-				"tags": ["Item"],
-				"summary": "Mark Item as Non-Active",
-				"description": "Mark an item as non-active by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": {
-							"type": "string"
-						},
-						"description": "ID of the item"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Item marked as non-active successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": { "type": "boolean" }
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Item not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/comment": {
-			"post": {
-				"tags": ["Comment"],
-				"summary": "Create a Comment (Parent or Reply)",
-				"description": "Create a new comment for an item. Can be a parent comment or a reply to another comment.",
-				"parameters": [
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"itemId": {
-										"type": "string",
-										"description": "ID of the item being commented"
-									},
-									"userId": {
-										"type": "string",
-										"description": "ID of the user making the comment"
-									},
-									"content": {
-										"type": "string",
-										"description": "Comment content"
-									},
-									"parentId": {
-										"type": "string",
-										"nullable": true,
-										"description": "ID of the parent comment (if this is a reply)"
-									}
-								},
-								"required": ["itemId", "userId", "content"]
-							},
-							"examples": {
-								"parent": {
-									"summary": "Create parent comment",
-									"value": {
-										"itemId": "item123",
-										"userId": "user456",
-										"content": "Barang ini milik siapa?"
-									}
-								},
-								"reply": {
-									"summary": "Create reply comment",
-									"value": {
-										"itemId": "item123",
-										"userId": "user789",
-										"content": "Saya tahu pemiliknya.",
-										"parentId": "cmt1"
-									}
-								}
-							}
-						}
-					}
-				},
-				"responses": {
-					"201": {
-						"description": "Comment created successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"$ref": "#/components/schemas/CommentWithReplies"
-										}
-									}
-								},
-								"examples": {
-									"parent": {
-										"summary": "Parent comment created",
-										"value": {
-											"data": {
-												"id": "cmt1",
-												"content": "Barang ini milik siapa?",
-												"user": {
-													"id": "user456",
-													"name": "Budi",
-													"username": "budi123",
-													"photoprofile": "https://example.com/photo1.jpg"
-												},
-												"createdAt": "2024-06-01T10:00:00Z",
-												"replies": []
-											}
-										}
-									},
-									"reply": {
-										"summary": "Reply comment created",
-										"value": {
-											"data": {
-												"id": "cmt2",
-												"content": "Saya tahu pemiliknya.",
-												"user": {
-													"id": "user789",
-													"name": "Siti",
-													"username": "siti456",
-													"photoprofile": "https://example.com/photo2.jpg"
-												},
-												"createdAt": "2024-06-01T10:05:00Z",
-												"replies": []
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"400": {
-						"description": "Bad request",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/comment/getByItem/{idItem}": {
-			"get": {
-				"tags": ["Comment"],
-				"summary": "Get Comments by Item (with Replies, Infinite Scroll)",
-				"description": "Retrieve comments for a specific item, including all nested replies (recursive). Supports infinite scroll with limit and cursor.",
-				"parameters": [
-					{
-						"name": "idItem",
-						"in": "path",
-						"required": true,
-						"schema": { "type": "string" },
-						"description": "ID of the item"
-					},
-					{
-						"name": "limit",
-						"in": "query",
-						"required": false,
-						"schema": {
-							"type": "integer",
-							"default": 20,
-							"minimum": 1,
-							"maximum": 100
-						},
-						"description": "Number of root comments to return"
-					},
-					{
-						"name": "cursor",
-						"in": "query",
-						"required": false,
-						"schema": { "type": "string" },
-						"description": "Cursor for pagination (e.g., last root comment ID or timestamp)"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Successful retrieval of comments",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "array",
-											"items": {
-												"$ref": "#/components/schemas/CommentWithReplies"
-											}
-										},
-										"nextCursor": {
-											"type": "string",
-											"nullable": true,
-											"description": "Cursor for the next page, or null if no more data"
-										}
-									}
-								},
-								"examples": {
-									"success": {
-										"summary": "Example response with nested replies",
-										"value": {
-											"data": [
-												{
-													"id": "cmt1",
-													"content": "Barang ini milik siapa?",
-													"user": {
-														"id": "user1",
-														"name": "Budi",
-														"username": "budi123",
-														"photoprofile": "https://example.com/photo1.jpg"
-													},
-													"createdAt": "2024-06-01T10:00:00Z",
-													"replies": [
-														{
-															"id": "cmt2",
-															"content": "Sepertinya milik saya.",
-															"user": {
-																"id": "user2",
-																"name": "Siti",
-																"username": "siti456",
-																"photoprofile": null
-															},
-															"createdAt": "2024-06-01T10:05:00Z",
-															"replies": [
-																{
-																	"id": "cmt3",
-																	"content": "Bisa sebutkan ciri-cirinya?",
-																	"user": {
-																		"id": "user1",
-																		"name": "Budi",
-																		"username": "budi123",
-																		"photoprofile": "https://example.com/photo1.jpg"
-																	},
-																	"createdAt": "2024-06-01T10:06:00Z",
-																	"replies": []
-																}
-															]
-														},
-														{
-															"id": "cmt4",
-															"content": "Saya juga kehilangan barang ini.",
-															"user": {
-																"id": "user3",
-																"name": "Andi",
-																"username": "andi789",
-																"photoprofile": null
-															},
-															"createdAt": "2024-06-01T10:07:00Z",
-															"replies": []
-														}
-													]
-												}
-											],
-											"nextCursor": "cmt1"
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Item or comments not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		},
-		"/api/comment/{idComment}": {
-			"patch": {
-				"tags": ["Comment"],
-				"summary": "Update a Comment",
-				"description": "Update a comment by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idComment",
-						"in": "path",
-						"required": true,
-						"schema": { "type": "string" },
-						"description": "ID of the comment to update"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"type": "object",
-								"properties": {
-									"content": { "type": "string" }
-								},
-								"required": ["content"]
-							}
-						}
-					}
-				},
-				"responses": {
-					"200": {
-						"description": "Comment updated successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"$ref": "#/components/schemas/CommentWithReplies"
-										}
-									}
-								},
-								"examples": {
-									"parent": {
-										"summary": "Parent comment created",
-										"value": {
-											"data": {
-												"id": "cmt1",
-												"content": "Barang ini milik siapa?",
-												"user": {
-													"id": "user456",
-													"name": "Budi",
-													"username": "budi123",
-													"photoprofile": "https://example.com/photo1.jpg"
-												},
-												"createdAt": "2024-06-01T10:00:00Z",
-												"updatedAt": "2024-07-01T10:00:00Z",
-												"replies": []
-											}
-										}
-									},
-									"reply": {
-										"summary": "Reply comment created",
-										"value": {
-											"data": {
-												"id": "cmt2",
-												"content": "Saya tahu pemiliknya.",
-												"user": {
-													"id": "user789",
-													"name": "Siti",
-													"username": "siti456",
-													"photoprofile": "https://example.com/photo2.jpg"
-												},
-												"createdAt": "2024-06-01T10:05:00Z",
-												"updatedAt": "2024-07-01T10:05:00Z",
-												"replies": []
-											}
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Comment not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			},
-			"delete": {
-				"tags": ["Comment"],
-				"summary": "Delete a Comment",
-				"description": "Delete a comment by its ID. Requires authentication.",
-				"parameters": [
-					{
-						"name": "idComment",
-						"in": "path",
-						"required": true,
-						"schema": { "type": "string" },
-						"description": "ID of the comment to delete"
-					},
-					{
-						"name": "Authorization",
-						"in": "header",
-						"required": true,
-						"schema": {
-							"type": "string",
-							"description": "Token for authentication"
-						}
-					}
-				],
-				"responses": {
-					"200": {
-						"description": "Comment deleted successfully",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"data": {
-											"type": "boolean",
-											"description": "True if deletion was successful"
-										}
-									}
-								}
-							}
-						}
-					},
-					"404": {
-						"description": "Comment not found",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					},
-					"401": {
-						"description": "Unauthorized",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "object",
-									"properties": {
-										"errors": { "type": "object" }
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	},
-	"components": {
-		"schemas": {
-			"CommentWithReplies": {
-				"type": "object",
-				"properties": {
-					"id": { "type": "string" },
-					"content": { "type": "string" },
-					"user": {
-						"type": "object",
-						"properties": {
-							"id": { "type": "string" },
-							"name": { "type": "string" },
-							"username": { "type": "string" },
-							"photoprofile": { "type": "string", "nullable": true }
-						}
-					},
-					"createdAt": { "type": "string", "format": "date-time" },
-					"updatedAt": {
-						"type": "string",
-						"format": "date-time",
-						"nullable": true
-					},
-					"replies": {
-						"type": "array",
-						"items": { "$ref": "#/components/schemas/CommentWithReplies" }
-					}
-				}
-			}
-		}
-	}
+    "openapi": "3.0.3",
+    "info": {
+        "title": "API Lost&Found",
+        "description": "API for the Lost&Found application, provide management of user, authentication, item, and comments.",
+        "version": "1.0"
+    },
+    "servers": [{ "url": "http://localhost:8889" }],
+    "tags": [
+        {
+            "name": "User",
+            "description": "Operations related to user management and authentication"
+        },
+        {
+            "name": "Category",
+            "description": "Operations related to item categories"
+        },
+        {
+            "name": "Province",
+            "description": "Operations related to provinces"
+        },
+        {
+            "name": "City",
+            "description": "Operations related to cities"
+        },
+        {
+            "name": "Item",
+            "description": "Operations related to item management"
+        },
+        {
+            "name": "Comment",
+            "description": "Operations related to comments on items"
+        }
+    ],
+    "paths": {
+        "/api/login": {
+            "post": {
+                "tags": ["User"],
+                "summary": "Login or Sign Up with Google",
+                "description": "Authenticate a user using Google OAuth. If the user does not exist, create a new user and return a JWT token.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "id_token": {
+                                        "type": "string",
+                                        "description": "Google ID token"
+                                    }
+                                },
+                                "required": ["id_token"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful login or sign up with Google",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "email": { "type": "string" },
+                                                "name": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "photoprofile": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "isAdmin": {
+                                                    "type": "boolean"
+                                                },
+                                                "token": { "type": "string" }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid Google ID token",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/{idOrEmail}": {
+            "get": {
+                "tags": ["User"],
+                "summary": "Get User by ID or Email",
+                "description": "Retrieve user information by user ID or email address.",
+                "parameters": [
+                    {
+                        "name": "idOrEmail",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "User ID or email address"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of user information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "email": { "type": "string" },
+                                                "name": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "photoprofile": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "isAdmin": {
+                                                    "type": "boolean"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "province": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["User"],
+                "summary": "Update User Information",
+                "description": "Update user information such as username, photoprofile, city, and province.",
+                "parameters": [
+                    {
+                        "name": "idOrEmail",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "User ID or email address"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "photoprofile": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "city": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "province": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful update of user information",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "email": { "type": "string" },
+                                                "name": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "username": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "photoprofile": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "isAdmin": {
+                                                    "type": "boolean"
+                                                },
+                                                "city": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "province": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category": {
+            "get": {
+                "tags": ["Category"],
+                "summary": "Get All Categories",
+                "description": "Retrieve a list of all item categories.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of categories",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "string" },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "slug": {
+                                                        "type": "string"
+                                                    },
+                                                    "itemCount": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Categories not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Category"],
+                "summary": "Create a New Category",
+                "description": "Create a new item category with a name and slug.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "Name of the category"
+                                    },
+                                    "slug": {
+                                        "type": "string",
+                                        "description": "Slug for the category",
+                                        "uniqueItems": true
+                                    }
+                                },
+                                "required": ["name", "slug"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Category created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "slug": { "type": "string" },
+                                                "itemCount": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/category/{idCategoryOrSlug}": {
+            "get": {
+                "tags": ["Category"],
+                "summary": "Get Category by ID or Slug",
+                "description": "Retrieve a category by its ID or slug.",
+                "parameters": [
+                    {
+                        "name": "idCategoryOrSlug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID or slug of the category"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of category",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "slug": { "type": "string" },
+                                                "itemCount": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Category not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/province": {
+            "get": {
+                "tags": ["Province"],
+                "summary": "Get All Provinces",
+                "description": "Retrieve a list of all provinces.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of provinces",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "string" },
+                                                    "name": { "type": "string" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Provinces not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/province/{idProvinceOrSlug}": {
+            "get": {
+                "tags": ["Province"],
+                "summary": "Get Province by ID or Slug",
+                "description": "Retrieve a province by its ID or slug.",
+                "parameters": [
+                    {
+                        "name": "idProvinceOrSlug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID or slug of the province"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of province",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "cities": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Province not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/city": {
+            "get": {
+                "tags": ["City"],
+                "summary": "Get All Cities",
+                "description": "Retrieve a list of all cities.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of cities",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "string" },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "provinceId": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Cities not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/city/{idCityOrSlug}": {
+            "get": {
+                "tags": ["City"],
+                "summary": "Get City by ID or Slug",
+                "description": "Retrieve a city by its ID or slug.",
+                "parameters": [
+                    {
+                        "name": "idCityOrSlug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID or slug of the city"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of city",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "provinceId": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "City not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/item": {
+            "get": {
+                "tags": ["Item"],
+                "summary": "Get All Items (Infinite Scroll)",
+                "description": "Retrieve a paginated list of items for infinite scroll. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        "description": "Number of items to return"
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Cursor for pagination (e.g., last item ID or timestamp)"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of items",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "string" },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": {
+                                                        "type": "string"
+                                                    },
+                                                    "category": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "address": {
+                                                        "type": "string"
+                                                    },
+                                                    "city": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "province": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "slug": {
+                                                                "type": "string"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    },
+                                                    "images": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "string"
+                                                                },
+                                                                "url": {
+                                                                    "type": "string"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "user": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "username": {
+                                                                "type": "string"
+                                                            },
+                                                            "photoprofile": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            }
+                                                        }
+                                                    },
+                                                    "isFound": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "foundAt": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "nullable": true
+                                                    },
+                                                    "isActive": {
+                                                        "type": "boolean"
+                                                    },
+                                                    "createdAt": {
+                                                        "type": "string",
+                                                        "format": "date-time"
+                                                    },
+                                                    "countComment": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "nextCursor": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "description": "Cursor for the next page, or null if no more data"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": ["Item"],
+                "summary": "Create a New Item",
+                "description": "Create a new item. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "userId": { "type": "string" },
+                                    "name": { "type": "string" },
+                                    "description": { "type": "string" },
+                                    "address": { "type": "string" },
+                                    "categoryId": { "type": "string" },
+                                    "cityId": { "type": "string" },
+                                    "provinceId": { "type": "string" },
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary",
+                                            "description": "Image file"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "userId",
+                                    "name",
+                                    "description",
+                                    "address",
+                                    "categoryId",
+                                    "cityId",
+                                    "provinceId",
+                                    "images"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Item created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "category": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "address": { "type": "string" },
+                                                "city": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "province": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "url": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "user": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "username": {
+                                                            "type": "string"
+                                                        },
+                                                        "photoprofile": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    }
+                                                },
+                                                "createdAt": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "countComment": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/item/{idItem}": {
+            "get": {
+                "tags": ["Item"],
+                "summary": "Get Item by ID",
+                "description": "Retrieve a single item by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of item",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": { "type": "string" },
+                                                "description": {
+                                                    "type": "string"
+                                                },
+                                                "category": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "address": { "type": "string" },
+                                                "city": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "province": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "slug": {
+                                                            "type": "string"
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        }
+                                                    }
+                                                },
+                                                "images": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "string"
+                                                            },
+                                                            "url": {
+                                                                "type": "string"
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "user": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "username": {
+                                                            "type": "string"
+                                                        },
+                                                        "photoprofile": {
+                                                            "type": "string",
+                                                            "nullable": true
+                                                        }
+                                                    }
+                                                },
+                                                "isFound": {
+                                                    "type": "boolean"
+                                                },
+                                                "foundAt": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "isActive": {
+                                                    "type": "boolean"
+                                                },
+                                                "createdAt": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "editedAt": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "countComment": {
+                                                    "type": "number"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": ["Item"],
+                "summary": "Update Item by ID",
+                "description": "Update an existing item by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": { "type": "string" },
+                                                "name": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "nullable": true
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/item/{idItem}/images": {
+            "post": {
+                "tags": ["Item"],
+                "summary": "Upload some Images for Item",
+                "description": "Upload images for an item by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "images": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary",
+                                            "description": "Image file"
+                                        }
+                                    }
+                                },
+                                "required": ["images"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Images uploaded successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": { "type": "string" },
+                                                    "url": { "type": "string" }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Item"],
+                "summary": "Delete Images from Item",
+                "description": "Delete one or more images from an item by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "imageIds": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "description": "Array of image IDs to delete"
+                                    }
+                                },
+                                "required": ["imageIds"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Images deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "boolean"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/item/{idItem}/found": {
+            "patch": {
+                "tags": ["Item"],
+                "summary": "Mark Item as Found",
+                "description": "Mark an item as found by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item marked as found successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": { "type": "boolean" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/item/{idItem}/nonactive": {
+            "patch": {
+                "tags": ["Item"],
+                "summary": "Mark Item as Non-Active",
+                "description": "Mark an item as non-active by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item marked as non-active successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": { "type": "boolean" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/comment": {
+            "post": {
+                "tags": ["Comment"],
+                "summary": "Create a Comment (Parent or Reply)",
+                "description": "Create a new comment for an item. Can be a parent comment or a reply to another comment.",
+                "parameters": [
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "itemId": {
+                                        "type": "string",
+                                        "description": "ID of the item being commented"
+                                    },
+                                    "userId": {
+                                        "type": "string",
+                                        "description": "ID of the user making the comment"
+                                    },
+                                    "content": {
+                                        "type": "string",
+                                        "description": "Comment content"
+                                    },
+                                    "parentId": {
+                                        "type": "string",
+                                        "nullable": true,
+                                        "description": "ID of the parent comment (if this is a reply)"
+                                    }
+                                },
+                                "required": ["itemId", "userId", "content"]
+                            },
+                            "examples": {
+                                "parent": {
+                                    "summary": "Create parent comment",
+                                    "value": {
+                                        "itemId": "item123",
+                                        "userId": "user456",
+                                        "content": "Barang ini milik siapa?"
+                                    }
+                                },
+                                "reply": {
+                                    "summary": "Create reply comment",
+                                    "value": {
+                                        "itemId": "item123",
+                                        "userId": "user789",
+                                        "content": "Saya tahu pemiliknya.",
+                                        "parentId": "cmt1"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Comment created successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CommentWithReplies"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "parent": {
+                                        "summary": "Parent comment created",
+                                        "value": {
+                                            "data": {
+                                                "id": "cmt1",
+                                                "content": "Barang ini milik siapa?",
+                                                "user": {
+                                                    "id": "user456",
+                                                    "name": "Budi",
+                                                    "username": "budi123",
+                                                    "photoprofile": "https://example.com/photo1.jpg"
+                                                },
+                                                "createdAt": "2024-06-01T10:00:00Z",
+                                                "replies": []
+                                            }
+                                        }
+                                    },
+                                    "reply": {
+                                        "summary": "Reply comment created",
+                                        "value": {
+                                            "data": {
+                                                "id": "cmt2",
+                                                "content": "Saya tahu pemiliknya.",
+                                                "user": {
+                                                    "id": "user789",
+                                                    "name": "Siti",
+                                                    "username": "siti456",
+                                                    "photoprofile": "https://example.com/photo2.jpg"
+                                                },
+                                                "createdAt": "2024-06-01T10:05:00Z",
+                                                "replies": []
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/comment/getByItem/{idItem}": {
+            "get": {
+                "tags": ["Comment"],
+                "summary": "Get Comments by Item (with Replies, Infinite Scroll)",
+                "description": "Retrieve comments for a specific item, including all nested replies (recursive). Supports infinite scroll with limit and cursor.",
+                "parameters": [
+                    {
+                        "name": "idItem",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "ID of the item"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 20,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        "description": "Number of root comments to return"
+                    },
+                    {
+                        "name": "cursor",
+                        "in": "query",
+                        "required": false,
+                        "schema": { "type": "string" },
+                        "description": "Cursor for pagination (e.g., last root comment ID or timestamp)"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful retrieval of comments",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/CommentWithReplies"
+                                            }
+                                        },
+                                        "nextCursor": {
+                                            "type": "string",
+                                            "nullable": true,
+                                            "description": "Cursor for the next page, or null if no more data"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "success": {
+                                        "summary": "Example response with nested replies",
+                                        "value": {
+                                            "data": [
+                                                {
+                                                    "id": "cmt1",
+                                                    "content": "Barang ini milik siapa?",
+                                                    "user": {
+                                                        "id": "user1",
+                                                        "name": "Budi",
+                                                        "username": "budi123",
+                                                        "photoprofile": "https://example.com/photo1.jpg"
+                                                    },
+                                                    "createdAt": "2024-06-01T10:00:00Z",
+                                                    "replies": [
+                                                        {
+                                                            "id": "cmt2",
+                                                            "content": "Sepertinya milik saya.",
+                                                            "user": {
+                                                                "id": "user2",
+                                                                "name": "Siti",
+                                                                "username": "siti456",
+                                                                "photoprofile": null
+                                                            },
+                                                            "createdAt": "2024-06-01T10:05:00Z",
+                                                            "replies": [
+                                                                {
+                                                                    "id": "cmt3",
+                                                                    "content": "Bisa sebutkan ciri-cirinya?",
+                                                                    "user": {
+                                                                        "id": "user1",
+                                                                        "name": "Budi",
+                                                                        "username": "budi123",
+                                                                        "photoprofile": "https://example.com/photo1.jpg"
+                                                                    },
+                                                                    "createdAt": "2024-06-01T10:06:00Z",
+                                                                    "replies": []
+                                                                }
+                                                            ]
+                                                        },
+                                                        {
+                                                            "id": "cmt4",
+                                                            "content": "Saya juga kehilangan barang ini.",
+                                                            "user": {
+                                                                "id": "user3",
+                                                                "name": "Andi",
+                                                                "username": "andi789",
+                                                                "photoprofile": null
+                                                            },
+                                                            "createdAt": "2024-06-01T10:07:00Z",
+                                                            "replies": []
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "nextCursor": "cmt1"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item or comments not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/comment/{idComment}": {
+            "patch": {
+                "tags": ["Comment"],
+                "summary": "Update a Comment",
+                "description": "Update a comment by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idComment",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "ID of the comment to update"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "content": { "type": "string" }
+                                },
+                                "required": ["content"]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Comment updated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/components/schemas/CommentWithReplies"
+                                        }
+                                    }
+                                },
+                                "examples": {
+                                    "parent": {
+                                        "summary": "Parent comment created",
+                                        "value": {
+                                            "data": {
+                                                "id": "cmt1",
+                                                "content": "Barang ini milik siapa?",
+                                                "user": {
+                                                    "id": "user456",
+                                                    "name": "Budi",
+                                                    "username": "budi123",
+                                                    "photoprofile": "https://example.com/photo1.jpg"
+                                                },
+                                                "createdAt": "2024-06-01T10:00:00Z",
+                                                "updatedAt": "2024-07-01T10:00:00Z",
+                                                "replies": []
+                                            }
+                                        }
+                                    },
+                                    "reply": {
+                                        "summary": "Reply comment created",
+                                        "value": {
+                                            "data": {
+                                                "id": "cmt2",
+                                                "content": "Saya tahu pemiliknya.",
+                                                "user": {
+                                                    "id": "user789",
+                                                    "name": "Siti",
+                                                    "username": "siti456",
+                                                    "photoprofile": "https://example.com/photo2.jpg"
+                                                },
+                                                "createdAt": "2024-06-01T10:05:00Z",
+                                                "updatedAt": "2024-07-01T10:05:00Z",
+                                                "replies": []
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": ["Comment"],
+                "summary": "Delete a Comment",
+                "description": "Delete a comment by its ID. Requires authentication.",
+                "parameters": [
+                    {
+                        "name": "idComment",
+                        "in": "path",
+                        "required": true,
+                        "schema": { "type": "string" },
+                        "description": "ID of the comment to delete"
+                    },
+                    {
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "description": "Token for authentication"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Comment deleted successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "boolean",
+                                            "description": "True if deletion was successful"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Comment not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "errors": { "type": "object" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CommentWithReplies": {
+                "type": "object",
+                "properties": {
+                    "id": { "type": "string" },
+                    "content": { "type": "string" },
+                    "user": {
+                        "type": "object",
+                        "properties": {
+                            "id": { "type": "string" },
+                            "name": { "type": "string" },
+                            "username": { "type": "string" },
+                            "photoprofile": {
+                                "type": "string",
+                                "nullable": true
+                            }
+                        }
+                    },
+                    "createdAt": { "type": "string", "format": "date-time" },
+                    "updatedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "replies": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/CommentWithReplies"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('username')->nullable()->unique();
             $table->string('photoprofile')->nullable();
             $table->string('token')->nullable();
-            $table->foreignUlid('id_city')->constrained('cities')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreignUlid('id_province')->constrained('provinces')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignUlid('id_city')->nullable()->constrained('cities')->onDelete('restrict')->onUpdate('cascade');
+            $table->foreignUlid('id_province')->nullable()->constrained('provinces')->onDelete('restrict')->onUpdate('cascade');
             $table->boolean('isAdmin')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();

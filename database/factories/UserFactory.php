@@ -28,7 +28,6 @@ class UserFactory extends Factory
         $city = City::inRandomOrder()->first();
         $province = $city->province ?? Province::inRandomOrder()->first();
         return [
-            'id' => Str::ulid(),
             'email' => fake()->unique()->safeEmail(),
             'googleId' => Str::random(16),
             'name' => fake()->name(),
@@ -39,7 +38,7 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'id_city' => $city?->id ?? City::factory(),
             'id_province' => $province?->id ?? Province::factory(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => Hash::make('123'),
             'remember_token' => Str::random(10),
         ];
     }
