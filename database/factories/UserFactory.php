@@ -2,9 +2,11 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
+use App\Models\City;
+use App\Models\Province;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
@@ -23,10 +25,20 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $city = City::inRandomOrder()->first();
+        $province = $city->province ?? Province::inRandomOrder()->first();
         return [
-            'name' => fake()->name(),
+            'id' => Str::ulid(),
             'email' => fake()->unique()->safeEmail(),
+            'googleId' => Str::random(16),
+            'name' => fake()->name(),
+            'username' => fake()->unique()->userName(),
+            'photoprofile' => fake()->imageUrl(),
+            'token' => fake()->sha256,
+            'isAdmin' => false,
             'email_verified_at' => now(),
+            'id_city' => $city?->id ?? City::factory(),
+            'id_province' => $province?->id ?? Province::factory(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ];
@@ -37,7 +49,7 @@ class UserFactory extends Factory
      */
     public function unverified(): static
     {
-        return $this->state(fn (array $attributes) => [
+        return $this->state(fn(array $attributes) => [
             'email_verified_at' => null,
         ]);
     }

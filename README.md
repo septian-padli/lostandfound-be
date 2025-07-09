@@ -20,8 +20,8 @@ RESTful API backend untuk aplikasi LostAndFound, yang berfungsi untuk mempermuda
 ## 📚 API Documentation
 
 API Specification tersedia dalam format **OpenAPI 3.0.3**:
-- File: [`api.json`](./api.json)
-- Base URL (development): `http://localhost:8889`
+- File: [`api.json`](./docs/api.json)
+- Base URL (development): `http://localhost:8888`
 
 ---
 
