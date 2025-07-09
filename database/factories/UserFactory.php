@@ -36,8 +36,8 @@ class UserFactory extends Factory
             'token' => fake()->sha256,
             'isAdmin' => false,
             'email_verified_at' => now(),
-            'id_city' => $city?->id ?? City::factory(),
-            'id_province' => $province?->id ?? Province::factory(),
+            'id_city' => $city?->id ?? null,
+            'id_province' => $province?->id ?? null,
             'password' => Hash::make('123'),
             'remember_token' => Str::random(10),
         ];

@@ -21,6 +21,9 @@ it('can login using mocked Google_Client', function () {
     // Replace Google_Client di Laravel container dengan mock
     $this->app->instance(Google_Client::class, $mockGoogleClient);
 
+    // assert token_id
+
+
     // Call API
     $response = $this->postJson('/api/login', [
         'id_token' => 'any-token',
@@ -34,4 +37,20 @@ it('can login using mocked Google_Client', function () {
     $this->assertDatabaseHas('users', [
         'email' => 'mockuser@example.com',
     ]);
+});
+it('returns 401 with invalid Google id_token', function () {
+    // Mock Google_Client
+    $mockGoogleClient = Mockery::mock(Google_Client::class);
+    $mockGoogleClient->shouldReceive('verifyIdToken')
+        ->once()
+        ->andReturn(null); // Token invalid
+
+    $this->app->instance(Google_Client::class, $mockGoogleClient);
+
+    $response = $this->postJson('/api/login', [
+        'id_token' => 'invalid_token',
+    ]);
+
+    $response->assertStatus(401)
+        ->assertJson(['error' => 'Invalid Google token']);
 });

@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Province;
 use Illuminate\Support\Str;
+use Database\Factories\ProvinceFactory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -17,6 +19,12 @@ class CityFactory extends Factory
      */
     public function definition(): array
     {
-        return [];
+        // Generate a random city name and slug
+        $cityName = fake()->city();
+        return [
+            'name' => $cityName,
+            'slug' => Str::slug($cityName),
+            'id_province' => null,
+        ];
     }
 }

@@ -30,6 +30,3 @@ Route::middleware('auth')->group(function () {
         })->name('admin.dashboard');
     });
 });
-
-
-require __DIR__ . '/api.php';

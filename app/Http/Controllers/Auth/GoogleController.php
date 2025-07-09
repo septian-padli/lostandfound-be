@@ -21,7 +21,6 @@ class GoogleController extends Controller
         $provider = Socialite::driver('google');
         $googleUser = $provider->stateless()->user();
 
-
         $user = User::updateOrCreate(
             ['googleId' => $googleUser->getId()],
             [
@@ -32,18 +31,30 @@ class GoogleController extends Controller
             ]
         );
 
-        Auth::login($user);
+        // Make sure $user is loaded by integer id (primary key)
+        $user = User::find($user->id);
+
+        Auth::guard('web')->login($user);
         if (!$user->isAdmin) {
-            return redirect('/')->with('error', 'Unauthorized');
+            return redirect('/');
         }
 
-        return redirect('/admin');
+        // return redirect('/admin');
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        // Tampilkan token ke user (sementara, untuk testing)
+        return response()->json([
+            'message' => 'Login Success',
+            'token' => $token,
+            'user' => $user
+        ]);
     }
 
 
     public function logout(Request $request)
     {
-        Auth::logout();  // Logout user dari session
+        // function auth logout
+        Auth::guard('web')->logout();
         $request->session()->invalidate();  // Invalidasi session lama
         $request->session()->regenerateToken();  // Buat CSRF token baru (opsional)
 
