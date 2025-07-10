@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Comment;
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\CommentResource;
 use App\Http\Requests\StoreCommentRequest;
 use App\Http\Requests\UpdateCommentRequest;
-use App\Models\Comment;
 
 class CommentController extends Controller
 {
@@ -16,51 +20,61 @@ class CommentController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StoreCommentRequest $request): JsonResponse
     {
-        //
+        $data = $request->validated();
+
+        $comment = Comment::create([
+            'id_item'   => $data['itemId'],
+            'id_user'   => $data['userId'],
+            'content'   => $data['content'],
+            'id_parent' => $data['parentId'] ?? null,
+        ]);
+
+        return response()->json(['data' => new CommentResource($comment->load('user', 'replies'))], 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreCommentRequest $request)
+    public function getByItem(Request $request, string $idItem): JsonResponse
     {
-        //
+        $limit  = (int) $request->query('limit', 20);
+        $cursor = $request->query('cursor');
+
+        $query = Comment::with(['user', 'replies'])
+            ->where('id_item', $idItem)
+            ->whereNull('id_parent')
+            ->orderByDesc('created_at');
+
+        if (!$query->exists()) {
+            return response()->json(['errors' => ['message' => 'Item not found']], 404);
+        }
+
+        if ($cursor) {
+            $query->where('id', '<', $cursor);
+        }
+
+        $comments = $query->limit($limit + 1)->get();
+        $nextCursor = $comments->count() > $limit ? $comments->pop()->id : null;
+
+        return response()->json([
+            'data'       => CommentResource::collection($comments),
+            'nextCursor' => $nextCursor,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Comment $comment)
+    public function update(UpdateCommentRequest $request, string $idComment): JsonResponse
     {
-        //
+        $comment = Comment::findOrFail($idComment);
+        $comment->update(['content' => $request->validated('content')]);
+
+        return response()->json(['data' => new CommentResource($comment->load('user', 'replies'))]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Comment $comment)
+    public function destroy(string $idComment): JsonResponse
     {
-        //
-    }
+        $comment = Comment::findOrFail($idComment);
+        $comment->deleted_at = now();
+        $comment->save();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateCommentRequest $request, Comment $comment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Comment $comment)
-    {
-        //
+        return response()->json(['data' => true]);
     }
 }

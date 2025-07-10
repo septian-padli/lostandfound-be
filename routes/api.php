@@ -5,6 +5,7 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\Auth\AuthApiController;
@@ -36,4 +37,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::patch('/item/{id}', [ItemController::class, 'update']);
     Route::post('/item/{idItem}/images', [ImageController::class, 'store']);
     Route::patch('/item/{idItem}/found', [ItemController::class, 'markAsFound']);
+
+    Route::prefix('comment')->group(function () {
+        // Create a new comment (parent or reply)
+        Route::post('/', [CommentController::class, 'store']);
+
+        // Get comments by item with replies (infinite scroll)
+        Route::get('/getByItem/{idItem}', [CommentController::class, 'getByItem']);
+
+        // Update a comment
+        Route::patch('/{idComment}', [CommentController::class, 'update']);
+
+        // Delete a comment
+        Route::delete('/{idComment}', [CommentController::class, 'destroy']);
+    });
 });
