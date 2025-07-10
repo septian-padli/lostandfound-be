@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\City;
+use App\Http\Resources\CityResource;
 use App\Http\Requests\StoreCityRequest;
 use App\Http\Requests\UpdateCityRequest;
-use App\Models\City;
 
 class CityController extends Controller
 {
@@ -13,7 +14,13 @@ class CityController extends Controller
      */
     public function index()
     {
-        //
+        $cities = City::orderBy('name')->get();
+
+        if ($cities->isEmpty()) {
+            return response()->json(['errors' => ['message' => 'Cities not found']], 404);
+        }
+
+        return CityResource::collection($cities);
     }
 
     /**
@@ -35,9 +42,17 @@ class CityController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(City $city)
+    public function show(string $idCityOrSlug)
     {
-        //
+        $city = City::where('id', $idCityOrSlug)
+            ->orWhere('slug', $idCityOrSlug)
+            ->first();
+
+        if (! $city) {
+            return response()->json(['errors' => ['message' => 'City not found']], 404);
+        }
+
+        return new CityResource($city);
     }
 
     /**

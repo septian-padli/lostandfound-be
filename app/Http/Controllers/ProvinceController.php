@@ -4,15 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Models\Province;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ProvinceResource;
 
 class ProvinceController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $provinces = Province::orderBy('name')->get();
+
+        if ($provinces->isEmpty()) {
+            return response()->json([
+                'errors' => ['message' => 'Provinces not found'],
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => ProvinceResource::collection($provinces),
+        ]);
     }
 
     /**
@@ -34,9 +47,22 @@ class ProvinceController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Province $province)
+    public function show(string $idOrSlug)
     {
-        //
+        $province = Province::with('cities')
+            ->where('id', $idOrSlug)
+            ->orWhere('slug', $idOrSlug)
+            ->first();
+
+        if (!$province) {
+            return response()->json([
+                'errors' => ['message' => 'Province not found'],
+            ], 404);
+        }
+
+        return response()->json([
+            'data' => new ProvinceResource($province),
+        ], 200);
     }
 
     /**
