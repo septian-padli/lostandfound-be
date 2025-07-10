@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Auth\AuthApiController;
 
 // prefix api
@@ -11,4 +12,9 @@ Route::post('/login', [AuthApiController::class, 'login']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/{idOrEmail}', [UserController::class, 'show']);
     Route::patch('/user/{idOrEmail}', [UserController::class, 'update']);
+
+    // Route for categories
+    Route::get('/category', [CategoryController::class, 'index']);
+    Route::get('/category/{idCategoryOrSlug}', [CategoryController::class, 'show']);
+    Route::post('/category', [CategoryController::class, 'store']);
 });

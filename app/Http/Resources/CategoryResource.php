@@ -3,12 +3,12 @@
 namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryResource extends ResourceCollection
+class CategoryResource extends JsonResource
 {
     /**
-     * Transform the resource collection into an array.
+     * Transform the resource into an array.
      *
      * @return array<int|string, mixed>
      */
@@ -18,7 +18,7 @@ class CategoryResource extends ResourceCollection
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'item_count' => $this->item_count,
+            'item_count' => $this->item_count ?? 0,
         ];
     }
 }
