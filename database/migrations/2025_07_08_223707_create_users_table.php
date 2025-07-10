@@ -21,6 +21,10 @@ return new class extends Migration
             $table->string('token')->nullable();
             $table->foreignUlid('id_city')->nullable()->constrained('cities')->onDelete('restrict')->onUpdate('cascade');
             $table->foreignUlid('id_province')->nullable()->constrained('provinces')->onDelete('restrict')->onUpdate('cascade');
+            $table->string('instagram')->nullable();
+            $table->string('twitter')->nullable();
+            $table->string('tiktok')->nullable();
+            $table->string('telegram')->nullable();
             $table->boolean('isAdmin')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();

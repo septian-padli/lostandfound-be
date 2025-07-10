@@ -78,6 +78,10 @@ class UserController extends Controller
             'city' => 'sometimes|nullable|exists:cities,id',
             'province' => 'sometimes|nullable|exists:provinces,id',
             'isAdmin' => 'sometimes|boolean',
+            'instagram' => 'sometimes|string|nullable',
+            'twitter' => 'sometimes|string|nullable',
+            'tiktok' => 'sometimes|string|nullable',
+            'telegram' => 'sometimes|string|nullable',
             'email_verified_at' => 'sometimes|nullable|date',
             'password' => 'sometimes|string|nullable|min:6',
         ]);

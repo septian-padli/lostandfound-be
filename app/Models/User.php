@@ -33,6 +33,10 @@ class User extends Authenticatable
         'id_city',
         'id_province',
         'isAdmin',
+        'instagram',
+        'twitter',
+        'tiktok',
+        'telegram',
         'email_verified_at',
         'password',
     ];

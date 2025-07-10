@@ -24,6 +24,10 @@ class UserResource extends JsonResource
             'isAdmin' => $this->isAdmin,
             'city' => $this->city?->name ?? null,
             'province' => $this->province?->name ?? null,
+            'instagram' => $this->instagram,
+            'twitter' => $this->twitter,
+            'tiktok' => $this->tiktok,
+            'telegram' => $this->telegram,
         ];
     }
 }
