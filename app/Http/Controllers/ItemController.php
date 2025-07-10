@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Item;
 use App\Models\Image;
+use Pest\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -11,6 +12,7 @@ use App\Http\Resources\ItemResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreItemRequest;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\SearchItemRequest;
 use App\Http\Requests\UpdateItemRequest;
 use Illuminate\Support\Facades\Validator;
 
@@ -71,6 +73,7 @@ class ItemController extends Controller
             'id_city' => $validated['cityId'],
             'id_province' => $validated['provinceId'],
             'name' => $validated['name'],
+            'slug' => Str::slug($validated['name']),
             'description' => $validated['description'],
             'address' => $validated['address'],
             'found_at' => now(), // default saat ini, atau bisa dari request jika ada
@@ -166,5 +169,96 @@ class ItemController extends Controller
         $item->save();
 
         return response()->json(['data' => true]);
+    }
+
+    public function search(SearchItemRequest $request)
+    {
+        $validated = $request->validated();
+
+        $query = Item::query()
+            ->with([
+                'category:id,name,slug',
+                'city:id,name,slug',
+                'province:id,name,slug',
+                'images:id,id_item,url',
+                'user:id,name,username,photoprofile'
+            ])
+            ->where('is_active', true)
+            ->where(function ($q) {
+                $q->where('is_found', false)
+                    ->orWhere(function ($q2) {
+                        $q2->where('is_found', true)
+                            ->where('found_at', '>=', now()->subWeek());
+                    });
+            });
+
+        // ➤ Cek apakah semua parameter kosong
+        $hasFilter = !empty($validated['q']) || !empty($validated['category']) || !empty($validated['city']) || !empty($validated['province']);
+
+        if (!$hasFilter) {
+            // Filter default by user's city
+            $query->where('id_city', $request->user()->id_city);
+        }
+
+        // ➤ Jika ada query
+        if (!empty($validated['q'])) {
+            $keywords = explode(' ', $validated['q']);
+            $query->where(function ($q) use ($keywords) {
+                foreach ($keywords as $keyword) {
+                    $q->where(function ($sub) use ($keyword) {
+                        $sub->where('name', 'like', "%$keyword%")
+                            ->orWhere('slug', 'like', "%$keyword%")
+                            ->orWhere('id', $keyword); // id harus exact
+                    });
+                }
+            });
+        }
+
+        if (!empty($validated['category'])) {
+            $query->whereHas(
+                'category',
+                fn($q) =>
+                $q->where('id', $validated['category'])
+                    ->orWhere('slug', $validated['category'])
+            );
+        }
+
+        if (!empty($validated['city'])) {
+            $query->whereHas(
+                'city',
+                fn($q) =>
+                $q->where('id', $validated['city'])
+                    ->orWhere('slug', $validated['city'])
+            );
+        }
+
+        if (!empty($validated['province'])) {
+            $query->whereHas(
+                'province',
+                fn($q) =>
+                $q->where('id', $validated['province'])
+                    ->orWhere('slug', $validated['province'])
+            );
+        }
+
+        // ➤ Infinite scroll
+        if (!empty($validated['cursor'])) {
+            $query->where('id', '<', $validated['cursor']);
+        }
+
+        $limit = $validated['limit'] ?? 20;
+        $items = $query->orderBy('created_at', 'desc')
+            ->limit($limit + 1)
+            ->get();
+
+        $nextCursor = null;
+        if ($items->count() > $limit) {
+            $nextCursor = $items->pop()->id;
+        }
+
+        return response()->json([
+            'data' => ItemResource::collection($items),
+            'nextCursor' => $nextCursor,
+        ]);
     }
 }

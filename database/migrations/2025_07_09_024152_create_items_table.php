@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignUlid('id_city')->constrained('cities')->onDelete('restrict');
             $table->foreignUlid('id_province')->constrained('provinces')->onDelete('restrict');
             $table->string('name');
+            $table->string('slug')->unique();
             $table->text('description');
             $table->string('address');
             $table->dateTime('found_at')->nullable();

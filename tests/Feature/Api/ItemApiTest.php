@@ -39,13 +39,14 @@ describe('Get all items', function () {
 describe('Create Item', function () {
     it('can create an item', function () {
         Sanctum::actingAs($user = User::factory()->create());
-        $category = Category::factory()->create();
+        $category = Category::factory()->create(['slug' => 'category-slug']);
         $province = Province::factory()->create(['slug' => 'province-slug']);
-        $city = City::factory()->create(['id_province' => $province->id]);
+        $city = City::factory()->create(['slug' => 'city-slug', 'id_province' => $province->id]);
 
         $payload = [
             'userId' => $user->id,
             'name' => 'Lost Phone',
+            'slug' => 'lost-phone', // tambahkan slug
             'description' => 'A black phone found on the street',
             'address' => 'Jl. Kebon Jeruk',
             'categoryId' => $category->id,
@@ -56,11 +57,23 @@ describe('Create Item', function () {
         $response = $this->postJson('/api/item', $payload);
 
         $response->assertStatus(201)
-            ->assertJsonFragment(['name' => 'Lost Phone'])
-            ->assertJsonStructure(['data' => ['id', 'name', 'description']]);
+            ->assertJsonFragment([
+                'name' => 'Lost Phone',
+                'slug' => 'lost-phone', // pastikan slug muncul di response
+            ])
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'slug',           // tambahkan ini
+                    'description',
+                    // tambahkan property lain sesuai dengan ItemResource
+                ]
+            ]);
 
-        expect(Item::where('name', 'Lost Phone')->exists())->toBeTrue();
+        expect(Item::where('name', 'Lost Phone')->where('slug', 'lost-phone')->exists())->toBeTrue();
     });
+
 
     it('returns validation errors if request is invalid', function () {
         Sanctum::actingAs(User::factory()->create());

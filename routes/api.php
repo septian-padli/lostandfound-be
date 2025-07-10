@@ -33,6 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/item', [ItemController::class, 'index']);
     Route::post('/item', [ItemController::class, 'store']);
+    Route::get('/item/search', [ItemController::class, 'search']);
     Route::get('/item/{id}', [ItemController::class, 'show']);
     Route::patch('/item/{id}', [ItemController::class, 'update']);
     Route::post('/item/{idItem}/images', [ImageController::class, 'store']);

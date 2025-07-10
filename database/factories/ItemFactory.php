@@ -6,6 +6,7 @@ use App\Models\City;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Province;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,12 +21,14 @@ class ItemFactory extends Factory
      */
     public function definition(): array
     {
+        $name = $this->faker->words(3, true);
         return [
             'id_user' => User::inRandomOrder()->first()?->id ?? User::factory(),
             'id_category' => Category::inRandomOrder()->first()?->id ?? Category::factory(),
             'id_city' => City::inRandomOrder()->first()?->id ?? City::factory(),
             'id_province' => Province::inRandomOrder()->first()?->id ?? Province::factory(),
-            'name' => $this->faker->words(3, true),
+            'name' => $name,
+            'slug' => Str::slug($name),
             'description' => $this->faker->paragraph,
             'address' => $this->faker->address,
             'is_found' => $isFound = $this->faker->boolean(30),
