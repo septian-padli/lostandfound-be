@@ -1362,15 +1362,18 @@
         "/api/item/{idItem}/images": {
             "post": {
                 "tags": ["Item"],
-                "summary": "Upload some Images for Item",
-                "description": "Upload images for an item by its ID. Requires authentication.",
+                "summary": "Upload Multiple Images for Item",
+                "description": "Upload one or more images for an item by its ID. Requires authentication.",
                 "parameters": [
                     {
                         "name": "idItem",
                         "in": "path",
                         "required": true,
                         "schema": {
-                            "type": "string"
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
                         },
                         "description": "ID of the item"
                     },
@@ -1397,7 +1400,8 @@
                                             "type": "string",
                                             "format": "binary",
                                             "description": "Image file"
-                                        }
+                                        },
+                                        "description": "Array of image files to upload"
                                     }
                                 },
                                 "required": ["images"]

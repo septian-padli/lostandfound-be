@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description');
             $table->string('address');
-            $table->dateTime('found_at');
+            $table->dateTime('found_at')->nullable();
             $table->boolean('is_found')->default(false);
             $table->boolean('is_active')->default(true);
             $table->unsignedInteger('count_comment')->default(0);

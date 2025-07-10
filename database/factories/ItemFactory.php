@@ -2,9 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\City;
 use App\Models\User;
 use App\Models\Category;
-use App\Models\City;
 use App\Models\Province;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -28,8 +28,8 @@ class ItemFactory extends Factory
             'name' => $this->faker->words(3, true),
             'description' => $this->faker->paragraph,
             'address' => $this->faker->address,
-            'found_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'is_found' => $this->faker->boolean(30),
+            'is_found' => $isFound = $this->faker->boolean(30),
+            'found_at' => $isFound ? $this->faker->dateTimeBetween('-1 year', 'now') : null,
             'is_active' => $this->faker->boolean(90),
             'count_comment' => $this->faker->numberBetween(0, 20),
         ];

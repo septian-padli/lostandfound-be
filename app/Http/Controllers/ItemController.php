@@ -3,11 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Item;
+use App\Models\Image;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ItemResource;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\StoreItemRequest;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UpdateItemRequest;
+use Illuminate\Support\Facades\Validator;
 
 class ItemController extends Controller
 {
@@ -84,9 +89,16 @@ class ItemController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Item $item)
+    public function show(string $id)
     {
-        //
+        $item = Item::with(['category', 'city', 'province', 'images', 'user'])
+            ->find($id);
+
+        if (! $item) {
+            return response()->json(['errors' => ['message' => 'Item not found']], 404);
+        }
+
+        return response()->json(['data' => new ItemResource($item)], 200);
     }
 
     /**
@@ -100,10 +112,33 @@ class ItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateItemRequest $request, Item $item)
+    public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'description' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+        ]);
+
+        $item = Item::find($id);
+
+        if (! $item) {
+            return response()->json(['errors' => ['message' => 'Item not found']], 404);
+        }
+
+        $item->fill($validated);
+        $item->updated_at = now(); // otomatis, jika pakai timestamps
+        $item->save();
+
+        return response()->json([
+            'data' => [
+                'id' => $item->id,
+                'name' => $item->name,
+                'description' => $item->description,
+                'address' => $item->address,
+            ],
+        ]);
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -111,5 +146,25 @@ class ItemController extends Controller
     public function destroy(Item $item)
     {
         //
+    }
+
+    public function markAsFound(string $idItem)
+    {
+        $item = Item::find($idItem);
+
+        if (! $item) {
+            return response()->json(['errors' => ['message' => 'Item not found']], 404);
+        }
+
+        // Opsional: pastikan hanya pemilik item yang bisa update
+        if ($item->id_user !== Auth::id()) {
+            return response()->json(['errors' => ['message' => 'Unauthorized']], 403);
+        }
+
+        $item->is_found = true;
+        $item->found_at = now();
+        $item->save();
+
+        return response()->json(['data' => true]);
     }
 }

@@ -2,65 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
+use App\Models\Image;
+use Illuminate\Support\Str;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreImageRequest;
 use App\Http\Requests\UpdateImageRequest;
-use App\Models\Image;
 
 class ImageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function store(StoreImageRequest $request, string $idItem)
     {
-        //
-    }
+        $item = Item::findOrFail($idItem);
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
+        $images = $request->file('images');
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreImageRequest $request)
-    {
-        //
-    }
+        $savedImages = [];
+        foreach ($images as $imageFile) {
+            $path = $imageFile->store('items', 'public');
+            $image = Image::create([
+                'id_item' => $item->id,
+                'url' => asset('storage/' . $path),
+            ]);
+            $savedImages[] = [
+                'id' => $image->id,
+                'url' => $image->url,
+            ];
+        }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Image $image)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Image $image)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateImageRequest $request, Image $image)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Image $image)
-    {
-        //
+        return response()->json(['data' => $savedImages], 200);
     }
 }

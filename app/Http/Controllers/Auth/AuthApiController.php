@@ -23,7 +23,12 @@ class AuthApiController extends Controller
 
         $user = User::updateOrCreate(
             ['googleId' => $payload['sub']],
-            ['email' => $payload['email'], 'name' => $payload['name']]
+            [
+                'email' => $payload['email'],
+                'name' => $payload['name'],
+                'username' => strstr($payload['email'], '@', true),
+                'photoprofile' => $payload['picture']
+            ]
         );
 
         $token = $user->createToken('auth_token')->plainTextToken;

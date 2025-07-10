@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ImageController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\Auth\AuthApiController;
@@ -31,4 +32,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/item', [ItemController::class, 'index']);
     Route::post('/item', [ItemController::class, 'store']);
+    Route::get('/item/{id}', [ItemController::class, 'show']);
+    Route::patch('/item/{id}', [ItemController::class, 'update']);
+    Route::post('/item/{idItem}/images', [ImageController::class, 'store']);
+    Route::patch('/item/{idItem}/found', [ItemController::class, 'markAsFound']);
 });
