@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProvinceController;
@@ -27,4 +28,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // route city
     Route::get('/city', [CityController::class, 'index']);
     Route::get('/city/{idCityOrSlug}', [CityController::class, 'show']);
+
+    Route::get('/item', [ItemController::class, 'index']);
+    Route::post('/item', [ItemController::class, 'store']);
 });

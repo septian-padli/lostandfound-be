@@ -11,7 +11,7 @@ class StoreItemRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,13 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'userId' => ['required', 'exists:users,id'],
+            'categoryId' => ['required', 'exists:categories,id'],
+            'cityId' => ['required', 'exists:cities,id'],
+            'provinceId' => ['required', 'exists:provinces,id'],
+            'name' => ['required', 'string'],
+            'description' => ['required', 'string'],
+            'address' => ['required', 'string'],
         ];
     }
 }

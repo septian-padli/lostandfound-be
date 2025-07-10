@@ -2,19 +2,48 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Item;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Resources\ItemResource;
 use App\Http\Requests\StoreItemRequest;
 use App\Http\Requests\UpdateItemRequest;
-use App\Models\Item;
 
 class ItemController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $limit = $request->query('limit', 20);
+        $cursor = $request->query('cursor');
+
+        $query = Item::query()
+            ->with(['category', 'city', 'province', 'images', 'user'])
+            ->orderBy('created_at', 'desc');
+
+        if ($cursor) {
+            $query->where('id', '<', $cursor);
+        }
+
+        $items = $query->limit($limit + 1)->get();
+
+        $nextCursor = null;
+        if ($items->count() > $limit) {
+            $nextCursor = $items->pop()->id;
+        }
+
+        if ($items->isEmpty()) {
+            return response()->json(['errors' => ['message' => 'Items not found']], 404);
+        }
+
+        return response()->json([
+            'data' => ItemResource::collection($items),
+            'nextCursor' => $nextCursor,
+        ]);
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -29,8 +58,28 @@ class ItemController extends Controller
      */
     public function store(StoreItemRequest $request)
     {
-        //
+        $validated = $request->validated();
+
+        $item = Item::create([
+            'id_user' => $validated['userId'],
+            'id_category' => $validated['categoryId'],
+            'id_city' => $validated['cityId'],
+            'id_province' => $validated['provinceId'],
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'address' => $validated['address'],
+            'found_at' => now(), // default saat ini, atau bisa dari request jika ada
+        ]);
+
+        // Handle images (optional: simpan di tabel images)
+        // Contoh: $item->images()->createMany([...]);
+
+        return response()->json([
+            'data' => new ItemResource($item->load(['category', 'city', 'province', 'images', 'user'])),
+        ], 201);
     }
+
+
 
     /**
      * Display the specified resource.
