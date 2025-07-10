@@ -69,12 +69,39 @@ class CommentController extends Controller
         return response()->json(['data' => new CommentResource($comment->load('user', 'replies'))]);
     }
 
-    public function destroy(string $idComment): JsonResponse
+    public function destroy(Request $request, string $idComment): JsonResponse
     {
-        $comment = Comment::findOrFail($idComment);
-        $comment->deleted_at = now();
-        $comment->save();
+        $comment = Comment::with('item')->find($idComment);
+
+        if (!$comment) {
+            return response()->json(['errors' => ['message' => 'Comment not found']], 404);
+        }
+
+        if ($request->user()->id !== $comment->id_user) {
+            return response()->json(['errors' => ['message' => 'Unauthorized']], 403);
+        }
+
+        $totalDeleted = $this->deleteCommentAndReplies($comment);
+
+        $comment->item->decrement('count_comment', $totalDeleted);
 
         return response()->json(['data' => true]);
+    }
+
+    /**
+     * Recursively delete a comment and its replies.
+     * @return int total deleted comments
+     */
+    private function deleteCommentAndReplies(Comment $comment): int
+    {
+        $totalDeleted = 1; // start from self
+
+        foreach ($comment->replies as $reply) {
+            $totalDeleted += $this->deleteCommentAndReplies($reply);
+        }
+
+        $comment->delete();
+
+        return $totalDeleted;
     }
 }
