@@ -95,8 +95,8 @@ class CitySeeder extends Seeder
                 'id_province' => '01HZY6QJ8ZK8X1YQ2R7V4B9C5D',
             ],
             [
-                'name' => 'Kabupaten Bandung',
-                'slug' => 'kabupaten-bandung-2',
+                'name' => 'Kabupaten Bandung Barat',
+                'slug' => 'kabupaten-bandung-barat',
                 'id_province' => '01HZY6QJ8ZK8X1YQ2R7V4B9C5D',
             ],
             [
@@ -115,6 +115,7 @@ class CitySeeder extends Seeder
                 'id_province' => '01HZY6QJ8ZK8X1YQ2R7V4B9C5D',
             ],
             [
+                'id' => '01HZY6QJ8ZK8X1YQ2R7V4H9C5D',
                 'name' => 'Kota Bandung',
                 'slug' => 'kota-bandung',
                 'id_province' => '01HZY6QJ8ZK8X1YQ2R7V4B9C5D',

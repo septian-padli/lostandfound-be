@@ -10,4 +10,5 @@ Route::post('/login', [AuthApiController::class, 'login']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user/{idOrEmail}', [UserController::class, 'show']);
+    Route::patch('/user/{idOrEmail}', [UserController::class, 'update']);
 });
